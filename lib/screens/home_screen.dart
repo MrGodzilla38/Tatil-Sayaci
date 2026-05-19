@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:tatil_sayaci/providers/app_provider.dart';
 import 'package:tatil_sayaci/widgets/countdown_card.dart';
 import 'package:tatil_sayaci/screens/calendar_screen.dart';
+import 'package:tatil_sayaci/screens/custom_dates_screen.dart';
 import 'package:tatil_sayaci/screens/add_date_screen.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -86,7 +87,7 @@ class HomeScreen extends StatelessWidget {
             heroTag: 'add',
             onPressed: () => Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => const AddDateScreen()),
+              MaterialPageRoute(builder: (_) => const CustomDatesScreen()),
             ),
             child: const Icon(Icons.add),
           ),
@@ -204,7 +205,7 @@ class HomeScreen extends StatelessWidget {
       child: InkWell(
         onTap: () => Navigator.push(
           context,
-          MaterialPageRoute(builder: (_) => const AddDateScreen()),
+          MaterialPageRoute(builder: (_) => const CustomDatesScreen()),
         ),
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -214,7 +215,7 @@ class HomeScreen extends StatelessWidget {
                   size: 48, color: Colors.grey[400]),
               const SizedBox(height: 12),
               Text(
-                'Özel bir gün eklemek için + butonuna tıklayın',
+                'Özel günlerinizi yönetmek için + butonuna tıklayın',
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.grey[600]),
               ),
