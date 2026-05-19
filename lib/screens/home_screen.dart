@@ -144,14 +144,58 @@ class HomeScreen extends StatelessWidget {
     final days = custom.daysRemaining;
     final formattedDate = DateFormat('dd MMMM yyyy', 'tr_TR').format(custom.date);
 
-    return CountdownCard(
-      title: '${custom.title}',
-      daysRemaining: days,
-      subtitle: formattedDate,
-      icon: Icons.star,
-      gradientStart: const Color(0xFF9C27B0),
-      gradientEnd: const Color(0xFF673AB7),
-      onDelete: () => _confirmDelete(context, provider, custom.id),
+    return GestureDetector(
+      onLongPress: () => _showCustomDateMenu(context, provider, custom),
+      child: CountdownCard(
+        title: '${custom.title}',
+        daysRemaining: days,
+        subtitle: formattedDate,
+        icon: Icons.star,
+        gradientStart: const Color(0xFF9C27B0),
+        gradientEnd: const Color(0xFF673AB7),
+        onDelete: () => _confirmDelete(context, provider, custom.id),
+        onEdit: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => AddDateScreen(existingDate: custom),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showCustomDateMenu(
+      BuildContext context, AppProvider provider, custom) {
+    showModalBottomSheet(
+      context: context,
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.edit, color: Colors.blue),
+              title: const Text('Düzenle'),
+              onTap: () {
+                Navigator.pop(ctx);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => AddDateScreen(existingDate: custom),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.delete, color: Colors.red),
+              title: const Text('Sil'),
+              onTap: () {
+                Navigator.pop(ctx);
+                _confirmDelete(context, provider, custom.id);
+              },
+            ),
+          ],
+        ),
+      ),
     );
   }
 

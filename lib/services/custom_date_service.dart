@@ -33,6 +33,15 @@ class CustomDateService {
     await saveCustomDates(dates);
   }
 
+  Future<void> updateCustomDate(CustomDate updatedDate) async {
+    final dates = await loadCustomDates();
+    final index = dates.indexWhere((d) => d.id == updatedDate.id);
+    if (index != -1) {
+      dates[index] = updatedDate;
+      await saveCustomDates(dates);
+    }
+  }
+
   CustomDate? getNextCustomDate(List<CustomDate> dates) {
     final upcoming = dates.where((d) => !d.isPast).toList();
     upcoming.sort((a, b) => a.date.compareTo(b.date));

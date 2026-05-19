@@ -8,6 +8,7 @@ class CountdownCard extends StatelessWidget {
   final Color gradientStart;
   final Color gradientEnd;
   final VoidCallback? onDelete;
+  final VoidCallback? onEdit;
 
   const CountdownCard({
     super.key,
@@ -18,6 +19,7 @@ class CountdownCard extends StatelessWidget {
     required this.gradientStart,
     required this.gradientEnd,
     this.onDelete,
+    this.onEdit,
   });
 
   @override
@@ -59,11 +61,23 @@ class CountdownCard extends StatelessWidget {
                         ),
                       ),
                     ),
-                    if (onDelete != null)
-                      IconButton(
-                        icon: const Icon(Icons.delete_outline,
-                            color: Colors.white70),
-                        onPressed: onDelete,
+                    if (onEdit != null || onDelete != null)
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (onEdit != null)
+                            IconButton(
+                              icon: const Icon(Icons.edit_outlined,
+                                  color: Colors.white70),
+                              onPressed: onEdit,
+                            ),
+                          if (onDelete != null)
+                            IconButton(
+                              icon: const Icon(Icons.delete_outline,
+                                  color: Colors.white70),
+                              onPressed: onDelete,
+                            ),
+                        ],
                       ),
                   ],
                 ),

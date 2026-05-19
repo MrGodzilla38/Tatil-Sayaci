@@ -38,4 +38,12 @@ class CustomDate {
       date: DateTime.parse(json['date'] as String),
     );
   }
+
+  CustomDate copyWith({String? id, String? title, DateTime? date}) {
+    return CustomDate(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      date: date ?? this.date,
+    );
+  }
 }

@@ -5,7 +5,9 @@ import 'package:tatil_sayaci/providers/app_provider.dart';
 import 'package:tatil_sayaci/models/custom_date.dart';
 
 class AddDateScreen extends StatefulWidget {
-  const AddDateScreen({super.key});
+  final CustomDate? existingDate;
+
+  const AddDateScreen({super.key, this.existingDate});
 
   @override
   State<AddDateScreen> createState() => _AddDateScreenState();
@@ -14,6 +16,16 @@ class AddDateScreen extends StatefulWidget {
 class _AddDateScreenState extends State<AddDateScreen> {
   final _titleController = TextEditingController();
   DateTime _selectedDate = DateTime.now();
+  bool get _isEditing => widget.existingDate != null;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.existingDate != null) {
+      _titleController.text = widget.existingDate!.title;
+      _selectedDate = widget.existingDate!.date;
+    }
+  }
 
   @override
   void dispose() {
@@ -25,7 +37,7 @@ class _AddDateScreenState extends State<AddDateScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Özel Gün Ekle'),
+        title: Text(_isEditing ? 'Özel Gün Düzenle' : 'Özel Gün Ekle'),
         centerTitle: true,
       ),
       body: Padding(
@@ -116,9 +128,9 @@ class _AddDateScreenState extends State<AddDateScreen> {
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              child: const Text(
-                'Kaydet',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              child: Text(
+                _isEditing ? 'Güncelle' : 'Kaydet',
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ),
           ],
@@ -148,17 +160,28 @@ class _AddDateScreenState extends State<AddDateScreen> {
       return;
     }
 
-    final customDate = CustomDate(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      title: title,
-      date: _selectedDate,
-    );
+    final provider = context.read<AppProvider>();
 
-    context.read<AppProvider>().addCustomDate(customDate);
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('"$title" eklendi')),
-    );
+    if (_isEditing) {
+      final updated = widget.existingDate!.copyWith(
+        title: title,
+        date: _selectedDate,
+      );
+      provider.updateCustomDate(updated);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('"$title" güncellendi')),
+      );
+    } else {
+      final customDate = CustomDate(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        title: title,
+        date: _selectedDate,
+      );
+      provider.addCustomDate(customDate);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('"$title" eklendi')),
+      );
+    }
 
     Navigator.pop(context);
   }

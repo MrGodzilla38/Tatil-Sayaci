@@ -90,6 +90,12 @@ class AppProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> updateCustomDate(CustomDate date) async {
+    await _customDateService.updateCustomDate(date);
+    _customDates = await _customDateService.loadCustomDates();
+    notifyListeners();
+  }
+
   Map<DateTime, List<Holiday>> get holidayEvents {
     final map = <DateTime, List<Holiday>>{};
     for (final holiday in _holidays) {
