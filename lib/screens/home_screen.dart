@@ -14,7 +14,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('TatilSayacı'),
+        title: const Text('Tatil Sayacı'),
         centerTitle: true,
         actions: [
           IconButton(
@@ -89,7 +89,7 @@ class HomeScreen extends StatelessWidget {
               context,
               MaterialPageRoute(builder: (_) => const CustomDatesScreen()),
             ),
-            child: const Icon(Icons.add),
+            child: const Icon(Icons.star),
           ),
           const SizedBox(height: 12),
           FloatingActionButton(

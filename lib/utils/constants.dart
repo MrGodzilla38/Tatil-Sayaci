@@ -1,5 +1,5 @@
 class AppConstants {
-  static const String appName = 'TatilSayacı';
+  static const String appName = 'Tatil Sayacı';
   static const String customDatesKey = 'custom_dates';
   static const String holidayCacheKey = 'holiday_cache';
   static const String holidayCacheTimestampKey = 'holiday_cache_timestamp';

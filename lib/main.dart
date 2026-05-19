@@ -26,7 +26,7 @@ class TatilSayaciApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (_) => AppProvider()..init(),
       child: MaterialApp(
-        title: 'TatilSayacı',
+        title: 'Tatil Sayacı',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(
