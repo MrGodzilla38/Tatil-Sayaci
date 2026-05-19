@@ -79,7 +79,11 @@ class HolidayService {
   }
 
   Holiday? getSummerHoliday(List<Holiday> holidays) {
-    return holidays.where((h) => h.type == HolidayType.summer).firstOrNull;
+    final upcoming = holidays
+        .where((h) => h.type == HolidayType.summer && !h.isPast)
+        .toList();
+    upcoming.sort((a, b) => a.startDate.compareTo(b.startDate));
+    return upcoming.isNotEmpty ? upcoming.first : null;
   }
 
   List<Holiday> getHolidaysForYear(List<Holiday> holidays, int year) {
