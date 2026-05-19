@@ -1,84 +1,139 @@
-import 'package:tatil_sayaci/models/holiday.dart';
-
 class AppConstants {
   static const String appName = 'TatilSayacı';
   static const String customDatesKey = 'custom_dates';
+  static const String holidayCacheKey = 'holiday_cache';
+  static const String holidayCacheTimestampKey = 'holiday_cache_timestamp';
+  static const String holidayCacheYearKey = 'holiday_cache_year';
+  static const String tallyfyApiUrl = 'https://tallyfy.com/national-holidays/api/TR/';
+  static const int minYear = 2025;
+  static const int maxYear = 2050;
 
-  static List<Holiday> get fallbackHolidays => [
-        Holiday(
-          title: 'Cumhuriyet Bayramı',
-          startDate: DateTime(2025, 10, 29),
-          type: HolidayType.national,
-        ),
-        Holiday(
-          title: '1. Ara Tatil',
-          startDate: DateTime(2025, 11, 10),
-          endDate: DateTime(2025, 11, 14),
-          type: HolidayType.school,
-        ),
-        Holiday(
-          title: 'Yılbaşı',
-          startDate: DateTime(2026, 1, 1),
-          type: HolidayType.national,
-        ),
-        Holiday(
-          title: 'Sömestr Tatili (15 Tatil)',
-          startDate: DateTime(2026, 1, 19),
-          endDate: DateTime(2026, 1, 30),
-          type: HolidayType.school,
-        ),
-        Holiday(
-          title: 'Ramazan Bayramı',
-          startDate: DateTime(2026, 3, 19),
-          endDate: DateTime(2026, 3, 22),
-          type: HolidayType.religious,
-        ),
-        Holiday(
-          title: '2. Ara Tatil',
-          startDate: DateTime(2026, 3, 16),
-          endDate: DateTime(2026, 3, 20),
-          type: HolidayType.school,
-        ),
-        Holiday(
-          title: '23 Nisan Ulusal Egemenlik ve Çocuk Bayramı',
-          startDate: DateTime(2026, 4, 23),
-          type: HolidayType.national,
-        ),
-        Holiday(
-          title: '1 Mayıs Emek ve Dayanışma Günü',
-          startDate: DateTime(2026, 5, 1),
-          type: HolidayType.national,
-        ),
-        Holiday(
-          title: '19 Mayıs Atatürk\'ü Anma, Gençlik ve Spor Bayramı',
-          startDate: DateTime(2026, 5, 19),
-          type: HolidayType.national,
-        ),
-        Holiday(
-          title: 'Kurban Bayramı',
-          startDate: DateTime(2026, 5, 26),
-          endDate: DateTime(2026, 5, 30),
-          type: HolidayType.religious,
-        ),
-        Holiday(
-          title: '15 Temmuz Demokrasi ve Milli Birlik Günü',
-          startDate: DateTime(2026, 7, 15),
-          type: HolidayType.national,
-        ),
-        Holiday(
-          title: '30 Ağustos Zafer Bayramı',
-          startDate: DateTime(2026, 8, 30),
-          type: HolidayType.national,
-        ),
-        Holiday(
-          title: 'Cumhuriyet Bayramı',
-          startDate: DateTime(2026, 10, 29),
-          type: HolidayType.national,
-        ),
-        Holiday(
-          title: 'Yaz Tatili',
-          startDate: DateTime(2026, 6, 26),
-          type: HolidayType.summer,
-        ),
-      ];
+  static const Map<int, Map<String, List<String>>> diyanetReligiousHolidays = {
+    2025: {
+      'ramazan': ['2025-03-30', '2025-03-31', '2025-04-01'],
+      'kurban': ['2025-06-06', '2025-06-07', '2025-06-08', '2025-06-09'],
+    },
+    2026: {
+      'ramazan': ['2026-03-19', '2026-03-20', '2026-03-21', '2026-03-22'],
+      'kurban': ['2026-05-26', '2026-05-27', '2026-05-28', '2026-05-29', '2026-05-30'],
+    },
+    2027: {
+      'ramazan': ['2027-03-08', '2027-03-09', '2027-03-10', '2027-03-11'],
+      'kurban': ['2027-05-16', '2027-05-17', '2027-05-18', '2027-05-19'],
+    },
+    2028: {
+      'ramazan': ['2028-02-25', '2028-02-26', '2028-02-27'],
+      'kurban': ['2028-05-05', '2028-05-06', '2028-05-07', '2028-05-08'],
+    },
+    2029: {
+      'ramazan': ['2029-02-13', '2029-02-14', '2029-02-15'],
+      'kurban': ['2029-04-24', '2029-04-25', '2029-04-26', '2029-04-27'],
+    },
+    2030: {
+      'ramazan': ['2030-02-03', '2030-02-04', '2030-02-05'],
+      'kurban': ['2030-04-14', '2030-04-15', '2030-04-16', '2030-04-17'],
+    },
+    2031: {
+      'ramazan': ['2031-01-23', '2031-01-24', '2031-01-25'],
+      'kurban': ['2031-04-03', '2031-04-04', '2031-04-05', '2031-04-06'],
+    },
+    2032: {
+      'ramazan': ['2032-01-13', '2032-01-14', '2032-01-15'],
+      'kurban': ['2032-03-22', '2032-03-23', '2032-03-24', '2032-03-25'],
+    },
+    2033: {
+      'ramazan': ['2033-01-01', '2033-01-02', '2033-01-03'],
+      'kurban': ['2033-03-11', '2033-03-12', '2033-03-13', '2033-03-14'],
+    },
+    2034: {
+      'ramazan': ['2033-12-21', '2033-12-22', '2033-12-23'],
+      'kurban': ['2034-03-01', '2034-03-02', '2034-03-03', '2034-03-04'],
+    },
+    2035: {
+      'ramazan': ['2035-12-11', '2035-12-12', '2035-12-13'],
+      'kurban': ['2035-02-18', '2035-02-19', '2035-02-20', '2035-02-21'],
+    },
+    2036: {
+      'ramazan': ['2035-11-30', '2035-11-30', '2035-12-01', '2035-12-02'],
+      'kurban': ['2036-02-08', '2036-02-09', '2036-02-10', '2036-02-11'],
+    },
+    2037: {
+      'ramazan': ['2037-11-18', '2037-11-19', '2037-11-20'],
+      'kurban': ['2037-01-26', '2037-01-27', '2037-01-28', '2037-01-29'],
+    },
+    2038: {
+      'ramazan': ['2038-11-08', '2038-11-09', '2038-11-10'],
+      'kurban': ['2038-01-16', '2038-01-17', '2038-01-18', '2038-01-19'],
+    },
+    2039: {
+      'ramazan': ['2039-10-28', '2039-10-29', '2039-10-30'],
+      'kurban': ['2039-01-05', '2039-01-06', '2039-01-07', '2039-01-08'],
+    },
+    2040: {
+      'ramazan': ['2040-10-16', '2040-10-17', '2040-10-18'],
+      'kurban': ['2040-12-25', '2040-12-26', '2040-12-27', '2040-12-28'],
+    },
+    2041: {
+      'ramazan': ['2041-10-06', '2041-10-07', '2041-10-08'],
+      'kurban': ['2041-12-14', '2041-12-15', '2041-12-16', '2041-12-17'],
+    },
+    2042: {
+      'ramazan': ['2042-09-25', '2042-09-26', '2042-09-27'],
+      'kurban': ['2042-12-04', '2042-12-05', '2042-12-06', '2042-12-07'],
+    },
+    2043: {
+      'ramazan': ['2043-09-14', '2043-09-15', '2043-09-16'],
+      'kurban': ['2043-11-23', '2043-11-24', '2043-11-25', '2043-11-26'],
+    },
+    2044: {
+      'ramazan': ['2044-09-02', '2044-09-03', '2044-09-04'],
+      'kurban': ['2044-11-11', '2044-11-12', '2044-11-13', '2044-11-14'],
+    },
+    2045: {
+      'ramazan': ['2045-08-22', '2045-08-23', '2045-08-24'],
+      'kurban': ['2045-11-01', '2045-11-02', '2045-11-03', '2045-11-04'],
+    },
+    2046: {
+      'ramazan': ['2045-08-12', '2045-08-13', '2045-08-14'],
+      'kurban': ['2045-10-21', '2045-10-22', '2045-10-23', '2045-10-24'],
+    },
+    2047: {
+      'ramazan': ['2047-07-22', '2047-07-23', '2047-07-24'],
+      'kurban': ['2047-10-10', '2047-10-11', '2047-10-12', '2047-10-13'],
+    },
+    2048: {
+      'ramazan': ['2048-07-10', '2048-07-11', '2048-07-12'],
+      'kurban': ['2048-09-28', '2048-09-29', '2048-09-30', '2048-10-01'],
+    },
+    2049: {
+      'ramazan': ['2049-06-30', '2049-07-01', '2049-07-02'],
+      'kurban': ['2049-09-17', '2049-09-18', '2049-09-19', '2049-09-20'],
+    },
+    2050: {
+      'ramazan': ['2050-06-19', '2050-06-20', '2050-06-21'],
+      'kurban': ['2049-09-07', '2049-09-08', '2049-09-09', '2049-09-10'],
+    },
+  };
+
+  static const Map<String, int> fixedNationalHolidays = {
+    '01-01': 1,
+    '04-23': 1,
+    '05-01': 1,
+    '05-19': 1,
+    '07-15': 1,
+    '08-30': 1,
+    '10-28': 1,
+    '10-29': 1,
+  };
+
+  static const Map<String, String> fixedNationalHolidayNames = {
+    '01-01': 'Yılbaşı',
+    '04-23': '23 Nisan Ulusal Egemenlik ve Çocuk Bayramı',
+    '05-01': '1 Mayıs Emek ve Dayanışma Günü',
+    '05-19': '19 Mayıs Atatürk\'ü Anma, Gençlik ve Spor Bayramı',
+    '07-15': '15 Temmuz Demokrasi ve Milli Birlik Günü',
+    '08-30': '30 Ağustos Zafer Bayramı',
+    '10-28': 'Cumhuriet Bayramı Arifesi',
+    '10-29': 'Cumhuriyet Bayramı',
+  };
 }

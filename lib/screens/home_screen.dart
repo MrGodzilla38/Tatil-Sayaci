@@ -35,21 +35,46 @@ class HomeScreen extends StatelessWidget {
           final next = provider.nextHoliday;
           final custom = provider.nextCustomDate;
 
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              children: [
-                if (summer != null)
-                  _buildSummerCard(context, summer),
-                const SizedBox(height: 16),
-                if (next != null)
-                  _buildNextHolidayCard(context, next),
-                const SizedBox(height: 16),
-                if (custom != null)
-                  _buildCustomDateCard(context, provider, custom),
-                if (custom == null && provider.customDates.isEmpty)
-                  _buildAddCustomHint(context),
-              ],
+          return RefreshIndicator(
+            onRefresh: () => provider.refreshHolidays(),
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          provider.cacheStatusText,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                        if (provider.isRefreshing)
+                          const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                      ],
+                    ),
+                  ),
+                  if (summer != null)
+                    _buildSummerCard(context, summer),
+                  const SizedBox(height: 16),
+                  if (next != null)
+                    _buildNextHolidayCard(context, next),
+                  const SizedBox(height: 16),
+                  if (custom != null)
+                    _buildCustomDateCard(context, provider, custom),
+                  if (custom == null && provider.customDates.isEmpty)
+                    _buildAddCustomHint(context),
+                ],
+              ),
             ),
           );
         },
@@ -84,7 +109,7 @@ class HomeScreen extends StatelessWidget {
     final formattedDate = DateFormat('dd MMMM yyyy', 'tr_TR').format(holiday.startDate);
 
     return CountdownCard(
-      title: '☀️ Yaz Tatiline',
+      title: 'Yaz Tatiline',
       daysRemaining: days,
       subtitle: days > 0 ? '$formattedDate tarihinde başlıyor' : 'Yaz tatili başladı!',
       icon: Icons.wb_sunny,
@@ -105,7 +130,7 @@ class HomeScreen extends StatelessWidget {
     }
 
     return CountdownCard(
-      title: '🎉 Sıradaki Tatil',
+      title: 'Sıradaki Tatil',
       daysRemaining: days,
       subtitle: '${holiday.title}\n$formattedDate',
       icon: Icons.celebration,
@@ -120,7 +145,7 @@ class HomeScreen extends StatelessWidget {
     final formattedDate = DateFormat('dd MMMM yyyy', 'tr_TR').format(custom.date);
 
     return CountdownCard(
-      title: '⭐ ${custom.title}',
+      title: '${custom.title}',
       daysRemaining: days,
       subtitle: formattedDate,
       icon: Icons.star,

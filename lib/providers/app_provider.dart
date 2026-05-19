@@ -12,10 +12,14 @@ class AppProvider extends ChangeNotifier {
   List<Holiday> _holidays = [];
   List<CustomDate> _customDates = [];
   bool _isLoading = true;
+  bool _isRefreshing = false;
+  String _cacheStatusText = '';
 
   List<Holiday> get holidays => _holidays;
   List<CustomDate> get customDates => _customDates;
   bool get isLoading => _isLoading;
+  bool get isRefreshing => _isRefreshing;
+  String get cacheStatusText => _cacheStatusText;
 
   Holiday? get summerHoliday => _holidayService.getSummerHoliday(_holidays);
   Holiday? get nextHoliday => _holidayService.getNextHoliday(_holidays);
@@ -26,12 +30,51 @@ class AppProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    _holidays = await _holidayService.getHolidays();
+    final cached = await _holidayService.getHolidays();
+    if (cached.isNotEmpty) {
+      _holidays = cached;
+      _cacheStatusText = await _holidayService.getCacheStatusText();
+    }
+
     _customDates = await _customDateService.loadCustomDates();
 
-    await NotificationService().scheduleAllReminders(_holidays);
+    if (_holidays.isNotEmpty) {
+      await NotificationService().scheduleAllReminders(_holidays);
+    }
 
     _isLoading = false;
+    notifyListeners();
+
+    _refreshInBackground();
+  }
+
+  Future<void> _refreshInBackground() async {
+    try {
+      final fresh = await _holidayService.refreshHolidays();
+      if (fresh.isNotEmpty) {
+        _holidays = fresh;
+        _cacheStatusText = await _holidayService.getCacheStatusText();
+        await NotificationService().scheduleAllReminders(_holidays);
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint('Background refresh failed: $e');
+    }
+  }
+
+  Future<void> refreshHolidays() async {
+    _isRefreshing = true;
+    notifyListeners();
+
+    try {
+      _holidays = await _holidayService.refreshHolidays();
+      _cacheStatusText = await _holidayService.getCacheStatusText();
+      await NotificationService().scheduleAllReminders(_holidays);
+    } catch (e) {
+      debugPrint('Manual refresh failed: $e');
+    }
+
+    _isRefreshing = false;
     notifyListeners();
   }
 

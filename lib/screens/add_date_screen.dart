@@ -132,7 +132,7 @@ class _AddDateScreenState extends State<AddDateScreen> {
       context: context,
       initialDate: _selectedDate,
       firstDate: DateTime(2025),
-      lastDate: DateTime(2030),
+      lastDate: DateTime(2050),
     );
     if (date != null) {
       setState(() => _selectedDate = date);

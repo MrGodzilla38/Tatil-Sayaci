@@ -19,6 +19,7 @@ dependencies:
   intl: ^0.20.0
   timezone: ^0.10.1
   provider: ^6.1.2
+  hijri_date: ^1.0.0
 
 dev_dependencies:
   flutter_test:

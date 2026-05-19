@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:tatil_sayaci/providers/app_provider.dart';
 import 'package:tatil_sayaci/models/holiday.dart';
 import 'package:tatil_sayaci/models/custom_date.dart';
+import 'package:tatil_sayaci/utils/constants.dart';
 
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({super.key});
@@ -17,6 +18,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
   CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
+  int _selectedYear = DateTime.now().year;
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +26,32 @@ class _CalendarScreenState extends State<CalendarScreen> {
       appBar: AppBar(
         title: const Text('Tatil Takvimi'),
         centerTitle: true,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: DropdownButton<int>(
+              value: _selectedYear,
+              underline: const SizedBox(),
+              items: List.generate(
+                AppConstants.maxYear - AppConstants.minYear + 1,
+                (index) => AppConstants.minYear + index,
+              ).map((year) {
+                return DropdownMenuItem(
+                  value: year,
+                  child: Text('$year', style: const TextStyle(fontSize: 14)),
+                );
+              }).toList(),
+              onChanged: (year) {
+                if (year != null) {
+                  setState(() {
+                    _selectedYear = year;
+                    _focusedDay = DateTime(year, _focusedDay.month, 1);
+                  });
+                }
+              },
+            ),
+          ),
+        ],
       ),
       body: Consumer<AppProvider>(
         builder: (context, provider, _) {
@@ -43,111 +71,125 @@ class _CalendarScreenState extends State<CalendarScreen> {
             allEvents[entry.key]!.addAll(entry.value);
           }
 
-          return Column(
-            children: [
-              TableCalendar<dynamic>(
-                firstDay: DateTime(2025, 1, 1),
-                lastDay: DateTime(2027, 12, 31),
-                focusedDay: _focusedDay,
-                calendarFormat: _calendarFormat,
-                selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-                onDaySelected: (selectedDay, focusedDay) {
-                  setState(() {
-                    _selectedDay = selectedDay;
+          return RefreshIndicator(
+            onRefresh: () => provider.refreshHolidays(),
+            child: Column(
+              children: [
+                TableCalendar<dynamic>(
+                  locale: 'tr_TR',
+                  firstDay: DateTime(AppConstants.minYear, 1, 1),
+                  lastDay: DateTime(AppConstants.maxYear, 12, 31),
+                  focusedDay: _focusedDay,
+                  calendarFormat: _calendarFormat,
+                  selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+                  onDaySelected: (selectedDay, focusedDay) {
+                    setState(() {
+                      _selectedDay = selectedDay;
+                      _focusedDay = focusedDay;
+                    });
+                  },
+                  onFormatChanged: (format) {
+                    if (_calendarFormat != format) {
+                      setState(() => _calendarFormat = format);
+                    }
+                  },
+                  onPageChanged: (focusedDay) {
                     _focusedDay = focusedDay;
-                  });
-                },
-                onFormatChanged: (format) {
-                  if (_calendarFormat != format) {
-                    setState(() => _calendarFormat = format);
-                  }
-                },
-                onPageChanged: (focusedDay) => _focusedDay = focusedDay,
-                eventLoader: (day) {
-                  final key = DateTime(day.year, day.month, day.day);
-                  return allEvents[key] ?? [];
-                },
-                calendarStyle: CalendarStyle(
-                  markerDecoration: const BoxDecoration(
-                    color: Colors.transparent,
+                    if (focusedDay.year != _selectedYear) {
+                      setState(() => _selectedYear = focusedDay.year);
+                    }
+                  },
+                  eventLoader: (day) {
+                    final key = DateTime(day.year, day.month, day.day);
+                    return allEvents[key] ?? [];
+                  },
+                  calendarStyle: CalendarStyle(
+                    markerDecoration: const BoxDecoration(
+                      color: Colors.transparent,
+                    ),
+                    markersMaxCount: 3,
+                    markerSize: 6,
+                    markerSizeScale: 1,
+                    todayDecoration: BoxDecoration(
+                      color: Colors.blue.withOpacity(0.3),
+                      shape: BoxShape.circle,
+                    ),
+                    selectedDecoration: const BoxDecoration(
+                      color: Colors.blue,
+                      shape: BoxShape.circle,
+                    ),
                   ),
-                  markersMaxCount: 3,
-                  markerSize: 6,
-                  markerSizeScale: 1,
-                  todayDecoration: BoxDecoration(
-                    color: Colors.blue.withOpacity(0.3),
-                    shape: BoxShape.circle,
-                  ),
-                  selectedDecoration: const BoxDecoration(
-                    color: Colors.blue,
-                    shape: BoxShape.circle,
-                  ),
-                ),
-                calendarBuilders: CalendarBuilders(
-                  markerBuilder: (context, date, events) {
-                    if (events.isEmpty) return const SizedBox();
-                    return Positioned(
-                      bottom: 1,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: events.take(3).map((event) {
-                          Color dotColor;
-                          if (event is Holiday) {
-                            switch (event.type) {
-                              case HolidayType.school:
-                                dotColor = Colors.blue;
-                                break;
-                              case HolidayType.national:
-                                dotColor = Colors.red;
-                                break;
-                              case HolidayType.religious:
-                                dotColor = Colors.green;
-                                break;
-                              case HolidayType.summer:
-                                dotColor = Colors.orange;
-                                break;
+                  calendarBuilders: CalendarBuilders(
+                    markerBuilder: (context, date, events) {
+                      if (events.isEmpty) return const SizedBox();
+                      return Positioned(
+                        bottom: 1,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: events.take(3).map((event) {
+                            Color dotColor;
+                            if (event is Holiday) {
+                              switch (event.type) {
+                                case HolidayType.school:
+                                  dotColor = Colors.blue;
+                                  break;
+                                case HolidayType.national:
+                                  dotColor = Colors.red;
+                                  break;
+                                case HolidayType.religious:
+                                  dotColor = Colors.green;
+                                  break;
+                                case HolidayType.summer:
+                                  dotColor = Colors.orange;
+                                  break;
+                              }
+                            } else if (event is CustomDate) {
+                              dotColor = Colors.purple;
+                            } else {
+                              dotColor = Colors.grey;
                             }
-                          } else if (event is CustomDate) {
-                            dotColor = Colors.purple;
-                          } else {
-                            dotColor = Colors.grey;
-                          }
-                          return Container(
-                            width: 6,
-                            height: 6,
-                            margin: const EdgeInsets.symmetric(horizontal: 1),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: dotColor,
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    );
+                            return Container(
+                              width: 6,
+                              height: 6,
+                              margin: const EdgeInsets.symmetric(horizontal: 1),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: dotColor,
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      );
+                    },
+                  ),
+                  headerStyle: const HeaderStyle(
+                    formatButtonVisible: true,
+                    titleCentered: true,
+                    formatButtonShowsNext: false,
+                  ),
+                  availableCalendarFormats: const {
+                    CalendarFormat.month: 'Ay',
+                    CalendarFormat.twoWeeks: '2 Hafta',
+                    CalendarFormat.week: 'Hafta',
                   },
                 ),
-                headerStyle: const HeaderStyle(
-                  formatButtonVisible: true,
-                  titleCentered: true,
-                  formatButtonShowsNext: false,
-                ),
-              ),
-              const Divider(),
-              Expanded(
-                child: _selectedDay != null
-                    ? _buildEventsList(
-                        allEvents,
-                        DateTime(
-                          _selectedDay!.year,
-                          _selectedDay!.month,
-                          _selectedDay!.day,
+                const Divider(),
+                Expanded(
+                  child: _selectedDay != null
+                      ? _buildEventsList(
+                          allEvents,
+                          DateTime(
+                            _selectedDay!.year,
+                            _selectedDay!.month,
+                            _selectedDay!.day,
+                          ),
+                        )
+                      : const Center(
+                          child: Text('Detay görmek için bir gün seçin'),
                         ),
-                      )
-                    : const Center(
-                        child: Text('Detay görmek için bir gün seçin'),
-                      ),
-              ),
-            ],
+                ),
+              ],
+            ),
           );
         },
       ),
