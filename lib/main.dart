@@ -5,6 +5,7 @@ import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:tatil_sayaci/providers/app_provider.dart';
 import 'package:tatil_sayaci/screens/home_screen.dart';
 import 'package:tatil_sayaci/services/notification_service.dart';
+import 'package:tatil_sayaci/services/daily_notification_updater.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,6 +15,8 @@ void main() async {
   await initializeDateFormatting('tr_TR', null);
 
   await NotificationService().init();
+
+  await DailyNotificationUpdater.register();
 
   runApp(const TatilSayaciApp());
 }

@@ -42,10 +42,28 @@ class AppProvider extends ChangeNotifier {
       await NotificationService().scheduleAllReminders(_holidays);
     }
 
+    await _startForegroundNotification();
+
     _isLoading = false;
     notifyListeners();
 
     _refreshInBackground();
+  }
+
+  Future<void> _startForegroundNotification() async {
+    await NotificationService().startForegroundNotification(
+      summerHoliday: summerHoliday,
+      nextHoliday: nextHoliday,
+      nextCustomDate: nextCustomDate,
+    );
+  }
+
+  Future<void> _updateForegroundNotification() async {
+    await NotificationService().updateForegroundNotification(
+      summerHoliday: summerHoliday,
+      nextHoliday: nextHoliday,
+      nextCustomDate: nextCustomDate,
+    );
   }
 
   Future<void> _refreshInBackground() async {
@@ -55,6 +73,7 @@ class AppProvider extends ChangeNotifier {
         _holidays = fresh;
         _cacheStatusText = await _holidayService.getCacheStatusText();
         await NotificationService().scheduleAllReminders(_holidays);
+        await _updateForegroundNotification();
         notifyListeners();
       }
     } catch (e) {
@@ -70,6 +89,7 @@ class AppProvider extends ChangeNotifier {
       _holidays = await _holidayService.refreshHolidays();
       _cacheStatusText = await _holidayService.getCacheStatusText();
       await NotificationService().scheduleAllReminders(_holidays);
+      await _updateForegroundNotification();
     } catch (e) {
       debugPrint('Manual refresh failed: $e');
     }
@@ -81,18 +101,21 @@ class AppProvider extends ChangeNotifier {
   Future<void> addCustomDate(CustomDate date) async {
     await _customDateService.addCustomDate(date);
     _customDates = await _customDateService.loadCustomDates();
+    await _updateForegroundNotification();
     notifyListeners();
   }
 
   Future<void> removeCustomDate(String id) async {
     await _customDateService.removeCustomDate(id);
     _customDates = await _customDateService.loadCustomDates();
+    await _updateForegroundNotification();
     notifyListeners();
   }
 
   Future<void> updateCustomDate(CustomDate date) async {
     await _customDateService.updateCustomDate(date);
     _customDates = await _customDateService.loadCustomDates();
+    await _updateForegroundNotification();
     notifyListeners();
   }
 

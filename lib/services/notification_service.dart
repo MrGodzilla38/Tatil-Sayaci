@@ -1,6 +1,8 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:tatil_sayaci/models/holiday.dart';
+import 'package:tatil_sayaci/models/custom_date.dart';
+import 'package:tatil_sayaci/services/notification_foreground_service.dart';
 
 class NotificationService {
   static final NotificationService _instance = NotificationService._();
@@ -70,5 +72,57 @@ class NotificationService {
 
   Future<void> cancelAll() async {
     await _plugin.cancelAll();
+  }
+
+  Future<void> startForegroundNotification({
+    required Holiday? summerHoliday,
+    required Holiday? nextHoliday,
+    required CustomDate? nextCustomDate,
+  }) async {
+    final summerVisible = summerHoliday != null;
+    final holidayVisible = nextHoliday != null;
+    final customVisible = nextCustomDate != null;
+    final emptyVisible = !summerVisible && !holidayVisible && !customVisible;
+
+    await NotificationForegroundService.start(
+      summerLabel: summerVisible ? 'Yaz Tatili' : '',
+      summerDays: summerVisible ? '${summerHoliday!.daysRemaining} gün kaldı' : '',
+      summerVisible: summerVisible,
+      holidayLabel: holidayVisible ? nextHoliday!.title : '',
+      holidayDays: holidayVisible ? '${nextHoliday.daysRemaining} gün kaldı' : '',
+      holidayVisible: holidayVisible,
+      customLabel: customVisible ? nextCustomDate!.title : '',
+      customDays: customVisible ? '${nextCustomDate.daysRemaining} gün kaldı' : '',
+      customVisible: customVisible,
+      emptyVisible: emptyVisible,
+    );
+  }
+
+  Future<void> updateForegroundNotification({
+    required Holiday? summerHoliday,
+    required Holiday? nextHoliday,
+    required CustomDate? nextCustomDate,
+  }) async {
+    final summerVisible = summerHoliday != null;
+    final holidayVisible = nextHoliday != null;
+    final customVisible = nextCustomDate != null;
+    final emptyVisible = !summerVisible && !holidayVisible && !customVisible;
+
+    await NotificationForegroundService.update(
+      summerLabel: summerVisible ? 'Yaz Tatili' : '',
+      summerDays: summerVisible ? '${summerHoliday!.daysRemaining} gün kaldı' : '',
+      summerVisible: summerVisible,
+      holidayLabel: holidayVisible ? nextHoliday!.title : '',
+      holidayDays: holidayVisible ? '${nextHoliday.daysRemaining} gün kaldı' : '',
+      holidayVisible: holidayVisible,
+      customLabel: customVisible ? nextCustomDate!.title : '',
+      customDays: customVisible ? '${nextCustomDate.daysRemaining} gün kaldı' : '',
+      customVisible: customVisible,
+      emptyVisible: emptyVisible,
+    );
+  }
+
+  Future<void> stopForegroundNotification() async {
+    await NotificationForegroundService.stop();
   }
 }
