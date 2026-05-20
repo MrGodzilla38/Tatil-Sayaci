@@ -79,9 +79,9 @@ class NotificationForegroundService : Service() {
         val customVisible = intent?.getBooleanExtra(EXTRA_CUSTOM_VISIBLE, false) ?: false
         val emptyVisible = intent?.getBooleanExtra(EXTRA_EMPTY_VISIBLE, false) ?: false
 
-        remoteViews.setViewVisibility(R.id.summer_container, if (summerVisible) android.view.View.VISIBLE else android.view.View.GONE)
-        remoteViews.setViewVisibility(R.id.holiday_container, if (holidayVisible) android.view.View.VISIBLE else android.view.View.GONE)
-        remoteViews.setViewVisibility(R.id.custom_container, if (customVisible) android.view.View.VISIBLE else android.view.View.GONE)
+        remoteViews.setViewVisibility(R.id.summer_card, if (summerVisible) android.view.View.VISIBLE else android.view.View.GONE)
+        remoteViews.setViewVisibility(R.id.holiday_card, if (holidayVisible) android.view.View.VISIBLE else android.view.View.GONE)
+        remoteViews.setViewVisibility(R.id.custom_card, if (customVisible) android.view.View.VISIBLE else android.view.View.GONE)
         remoteViews.setViewVisibility(R.id.empty_message, if (emptyVisible) android.view.View.VISIBLE else android.view.View.GONE)
 
         if (summerVisible) {
