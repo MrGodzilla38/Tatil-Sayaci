@@ -6,6 +6,7 @@ import 'package:tatil_sayaci/widgets/countdown_card.dart';
 import 'package:tatil_sayaci/screens/calendar_screen.dart';
 import 'package:tatil_sayaci/screens/custom_dates_screen.dart';
 import 'package:tatil_sayaci/screens/add_date_screen.dart';
+import 'package:tatil_sayaci/screens/settings_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -18,10 +19,10 @@ class HomeScreen extends StatelessWidget {
         centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.calendar_month),
+            icon: const Icon(Icons.settings),
             onPressed: () => Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => const CalendarScreen()),
+              MaterialPageRoute(builder: (_) => const SettingsScreen()),
             ),
           ),
         ],

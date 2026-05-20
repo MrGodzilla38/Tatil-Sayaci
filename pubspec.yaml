@@ -2,7 +2,7 @@ name: tatil_sayaci
 description: "Bir sonraki tatilin ne olduğunu ve kaç gün kaldığını gösteren mobil uygulama."
 publish_to: 'none'
 
-version: 1.2.0+1
+version: 1.3.0+1
 
 environment:
   sdk: ^3.6.2
@@ -21,6 +21,8 @@ dependencies:
   provider: ^6.1.2
   hijri_date: ^1.0.0
   workmanager: ^0.5.2
+  url_launcher: ^6.3.1
+  package_info_plus: ^8.0.0
 
 dev_dependencies:
   flutter_test:
