@@ -8,9 +8,14 @@ import 'package:tatil_sayaci/screens/custom_dates_screen.dart';
 import 'package:tatil_sayaci/screens/add_date_screen.dart';
 import 'package:tatil_sayaci/screens/settings_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

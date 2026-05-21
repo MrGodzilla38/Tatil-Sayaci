@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:tatil_sayaci/providers/app_provider.dart';
+import 'package:tatil_sayaci/providers/settings_provider.dart';
 import 'package:tatil_sayaci/screens/home_screen.dart';
 import 'package:tatil_sayaci/services/notification_service.dart';
 import 'package:tatil_sayaci/services/daily_notification_updater.dart';
@@ -26,47 +27,54 @@ class TatilSayaciApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => AppProvider()..init(),
-      child: MaterialApp(
-        title: 'Tatil Sayacı',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color(0xFF4CAF50),
-            brightness: Brightness.light,
-          ),
-          useMaterial3: true,
-          appBarTheme: const AppBarTheme(
-            centerTitle: true,
-            elevation: 0,
-          ),
-          cardTheme: CardTheme(
-            elevation: 2,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => SettingsProvider()..init()),
+        ChangeNotifierProvider(create: (_) => AppProvider()..init()),
+      ],
+      child: Consumer<SettingsProvider>(
+        builder: (context, settings, _) {
+          return MaterialApp(
+            title: 'Tatil Sayacı',
+            debugShowCheckedModeBanner: false,
+            theme: ThemeData(
+              colorScheme: ColorScheme.fromSeed(
+                seedColor: const Color(0xFF4CAF50),
+                brightness: Brightness.light,
+              ),
+              useMaterial3: true,
+              appBarTheme: const AppBarTheme(
+                centerTitle: true,
+                elevation: 0,
+              ),
+              cardTheme: CardTheme(
+                elevation: 2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
             ),
-          ),
-        ),
-        darkTheme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color(0xFF4CAF50),
-            brightness: Brightness.dark,
-          ),
-          useMaterial3: true,
-          appBarTheme: const AppBarTheme(
-            centerTitle: true,
-            elevation: 0,
-          ),
-          cardTheme: CardTheme(
-            elevation: 2,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
+            darkTheme: ThemeData(
+              colorScheme: ColorScheme.fromSeed(
+                seedColor: const Color(0xFF4CAF50),
+                brightness: Brightness.dark,
+              ),
+              useMaterial3: true,
+              appBarTheme: const AppBarTheme(
+                centerTitle: true,
+                elevation: 0,
+              ),
+              cardTheme: CardTheme(
+                elevation: 2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
             ),
-          ),
-        ),
-        themeMode: ThemeMode.system,
-        home: const HomeScreen(),
+            themeMode: settings.themeMode,
+            home: const HomeScreen(),
+          );
+        },
       ),
     );
   }

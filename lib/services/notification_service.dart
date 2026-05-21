@@ -1,4 +1,5 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:tatil_sayaci/models/holiday.dart';
 import 'package:tatil_sayaci/models/custom_date.dart';
@@ -9,9 +10,14 @@ class NotificationService {
   factory NotificationService() => _instance;
   NotificationService._();
 
+  static const String _notifKey = 'notifications_enabled';
+
   final FlutterLocalNotificationsPlugin _plugin =
       FlutterLocalNotificationsPlugin();
   bool _initialized = false;
+  bool _enabled = false;
+
+  bool get isEnabled => _enabled;
 
   Future<void> init() async {
     if (_initialized) return;
@@ -34,10 +40,15 @@ class NotificationService {
         >()
         ?.requestNotificationsPermission();
 
+    final prefs = await SharedPreferences.getInstance();
+    _enabled = prefs.getBool(_notifKey) ?? true;
+
     _initialized = true;
   }
 
   Future<void> scheduleHolidayReminder(Holiday holiday) async {
+    if (!_enabled) return;
+
     final now = DateTime.now();
     final reminderDate = holiday.startDate.subtract(const Duration(days: 1));
 
@@ -65,6 +76,8 @@ class NotificationService {
   }
 
   Future<void> scheduleAllReminders(List<Holiday> holidays) async {
+    if (!_enabled) return;
+
     for (final holiday in holidays) {
       await scheduleHolidayReminder(holiday);
     }
@@ -79,6 +92,8 @@ class NotificationService {
     required Holiday? nextHoliday,
     required CustomDate? nextCustomDate,
   }) async {
+    _enabled = true;
+
     final summerVisible = summerHoliday != null;
     final holidayVisible = nextHoliday != null;
     final customVisible = nextCustomDate != null;
@@ -103,6 +118,8 @@ class NotificationService {
     required Holiday? nextHoliday,
     required CustomDate? nextCustomDate,
   }) async {
+    if (!_enabled) return;
+
     final summerVisible = summerHoliday != null;
     final holidayVisible = nextHoliday != null;
     final customVisible = nextCustomDate != null;
@@ -123,6 +140,7 @@ class NotificationService {
   }
 
   Future<void> stopForegroundNotification() async {
+    _enabled = false;
     await NotificationForegroundService.stop();
   }
 }

@@ -1,10 +1,12 @@
 import 'package:workmanager/workmanager.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tatil_sayaci/services/holiday_service.dart';
 import 'package:tatil_sayaci/services/custom_date_service.dart';
 import 'package:tatil_sayaci/services/notification_foreground_service.dart';
 
 class DailyNotificationUpdater {
   static const String dailyTaskId = 'tatil_sayaci_daily_update';
+  static const String _notifKey = 'notifications_enabled';
 
   static Future<void> register() async {
     await Workmanager().initialize(callbackDispatcher, isInDebugMode: false);
@@ -25,6 +27,13 @@ class DailyNotificationUpdater {
   static void callbackDispatcher() {
     Workmanager().executeTask((task, inputData) async {
       try {
+        final prefs = await SharedPreferences.getInstance();
+        final notificationsEnabled = prefs.getBool(_notifKey) ?? true;
+
+        if (!notificationsEnabled) {
+          return Future.value(true);
+        }
+
         final holidayService = HolidayService();
         final customDateService = CustomDateService();
 

@@ -42,7 +42,9 @@ class AppProvider extends ChangeNotifier {
       await NotificationService().scheduleAllReminders(_holidays);
     }
 
-    await _startForegroundNotification();
+    if (NotificationService().isEnabled) {
+      await _startForegroundNotification();
+    }
 
     _isLoading = false;
     notifyListeners();
@@ -56,6 +58,14 @@ class AppProvider extends ChangeNotifier {
       nextHoliday: nextHoliday,
       nextCustomDate: nextCustomDate,
     );
+  }
+
+  Future<void> enableNotifications() async {
+    await _startForegroundNotification();
+  }
+
+  Future<void> disableNotifications() async {
+    await NotificationService().stopForegroundNotification();
   }
 
   Future<void> _updateForegroundNotification() async {
