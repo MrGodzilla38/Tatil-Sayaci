@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -53,21 +52,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     try {
       final response = await http.get(
-        Uri.parse('https://api.github.com/repos/MrGodzilla38/Tatil-Sayaci/releases/latest'),
-        headers: {'Accept': 'application/vnd.github.v3+json'},
+        Uri.parse('https://raw.githubusercontent.com/MrGodzilla38/Tatil-Sayaci/main/pubspec.yaml'),
       );
 
       if (!context.mounted) return;
       Navigator.pop(context);
 
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body) as Map<String, dynamic>;
-        final latestTag = data['tag_name'] as String? ?? '';
-        final versionMatch = RegExp(r'(\d+\.\d+\.\d+)').firstMatch(latestTag);
+        final versionMatch = RegExp(r'version:\s*(\d+\.\d+\.\d+)').firstMatch(response.body);
         final latestVersion = versionMatch?.group(1) ?? '';
 
         final info = await PackageInfo.fromPlatform();
         final currentVersion = info.version;
+
+        if (latestVersion.isEmpty) {
+          _showResultDialog('Güncelleme Kontrolü', '❌ Sürüm bilgisi alınamadı', null);
+          return;
+        }
 
         final isUpToDate = _compareVersions(currentVersion, latestVersion) >= 0;
 
@@ -78,14 +79,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
         } else {
           _showResultDialog(
             'Güncelleme Kontrolü',
-            'Yeni sürüm bulundu $latestTag',
+            'Yeni sürüm bulundu v$latestVersion',
             'Güncelle',
           );
         }
       } else {
         if (!context.mounted) return;
-        Navigator.pop(context);
-        _showResultDialog('Güncelleme Kontrolü', '❌ Sürüm bilgisi alınamadı', null);
+        _showResultDialog('Güncelleme Kontrolü', '❌ Sürüm bilgisi alınamadı (${response.statusCode})', null);
       }
     } catch (e) {
       if (!context.mounted) return;
